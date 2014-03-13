@@ -3,6 +3,7 @@
 import serial
 import RPi.GPIO as GPIO
 import time
+from bitstampy import api
 
 port = serial.Serial("/dev/ttyUSB0", baudrate=9600, timeout=0)
 GPIO.setmode(GPIO.BCM)
@@ -13,6 +14,10 @@ totalpennies = 0
 totalnickels = 0
 totaldimes = 0
 totalquarters = 0
+
+ticker = api.ticker()
+
+print "1 Bitcoin =", ticker['last'], "USD"
 
 def waitForButton():
 	pennies = 0
@@ -48,9 +53,13 @@ def waitForButton():
 while True:
 	print "put some money in"
 	transaction = waitForButton();
-	print "before runningtotal is", runningtotal, "pennies total", totalpennies
 	runningtotal += transaction[0]
 	totalpennies += transaction[1]
-	print "runningtotal is", runningtotal, "pennies total", totalpennies
-	time.sleep(5) #this is where we print
+	totalnickels += transaction[2]
+	totaldimes += transaction[3]
+	totalquarters += transaction[4]
+
+	print "You put in $" + str(transaction[0]), "which is", transaction[0]/float(ticker['last']), "bitcoin"
+	
+	time.sleep(2) #this is where we print
 	transactiontotal = 0.
